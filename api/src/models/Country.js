@@ -36,5 +36,10 @@ module.exports = (sequelize) => {
     population: {
       type: DataTypes.FLOAT,
     },
+    createdInDb: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
   });
 };
