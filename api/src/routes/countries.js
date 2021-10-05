@@ -1,36 +1,15 @@
 const { Router } = require('express');
 const { Op } = require('sequelize');
 const { Activity, Country, Activity_Country } = require ('../db.js'); // estoy importando los modelos conectados
-const axios = require ('axios');
+
+
 const router = Router ();
 
 
 
-const data = async () => {
-    const api = await axios.get('https://restcountries.com/v3/all');
-       // peticion a la api, recorro y traigo lo que necesito
-       const infoCountries = await api.data.map( c => {
-           return {
-                    id: c.alpha3code,
-                    name: c.name.common || 'name',
-                    flag: c.flags,
-                    continent: c.continent,
-                    capital: c.capital && c.capital[0] || 'Capital not found',
-                    subregion: c.subregion,
-                    area: c.area,
-                    population: c.population,
-                }
-        });  
-        return infoCountries;
-};
 
-
-// GET /countries?name="...":
-// Obtener los países que coincidan con el nombre pasado como query parameter (No necesariamente tiene que ser una matcheo exacto)
-// Si no existe ningún país mostrar un mensaje adecuado
 router.get('/', async (req, res, next) => {
     const { name } = req.query;
-    const apiCountries = await data(); // invoco la info de la api
     try{
         let detail = await Country.findAll(); // hago la consulta a mi db, si tengo los datos no hace nada, sino los tiene, los creo...
         if(detail.length === 0) await Country.bulkCreate(apiCountries) 
@@ -62,10 +41,7 @@ router.get('/', async (req, res, next) => {
     };
 });
 
-// GET /countries/{idPais}:
-// Obtener el detalle de un país en particular
-// Debe traer solo los datos pedidos en la ruta de detalle de país
-// Incluir los datos de las actividades turísticas correspondientes
+
 const getCountries = async()=>{
     return await Country.findAll({
         include:{
